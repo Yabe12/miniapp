@@ -12,6 +12,7 @@ const StudentForm = () => {
     yearOfCampus: "",
     campusName: "",
     githubLink: "",
+    linkedinProfile: "",
     portfolioLink: "",
     cv: null,
     universityDocument: null,
@@ -19,6 +20,7 @@ const StudentForm = () => {
 
   const [showEducation, setShowEducation] = useState(false);
   const [loading, setLoading] = useState(false); // State for loading
+  const [error, setError] = useState(""); // State for error messages
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,8 +32,51 @@ const StudentForm = () => {
     setFormData({ ...formData, [name]: files[0] });
   };
 
+  const validatePhoneNumber = (phoneNumber) => {
+    const phonePattern = /^(09|07)\d{8}$/; // Regex to check for 09 or 07 followed by 8 digits
+    return phonePattern.test(phoneNumber);
+  };
+
+  const validateEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
+    return emailPattern.test(email);
+  };
+
+  const validateLinkedIn = (linkedin) => {
+    const linkedinPattern = /^(https?:\/\/)?(www\.)?(linkedin\.com\/in\/[A-Za-z0-9_-]+\/?)/; // Basic LinkedIn URL regex
+    return linkedinPattern.test(linkedin);
+  };
+
+  const validateGitHub = (github) => {
+    const githubPattern = /^(https?:\/\/)?(www\.)?(github\.com\/[A-Za-z0-9_-]+\/?)/; // Basic GitHub URL regex
+    return githubPattern.test(github);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError(""); // Reset error state
+    
+    // Validate all fields
+    if (!validatePhoneNumber(formData.phoneNumber)) {
+      setError("Phone number must start with 09 or 07 and be exactly 10 digits long.");
+      return;
+    }
+    
+    if (!validateEmail(formData.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    
+    if (formData.linkedinProfile && !validateLinkedIn(formData.linkedinProfile)) {
+      setError("Please enter a valid LinkedIn profile URL.");
+      return;
+    }
+    
+    if (formData.githubLink && !validateGitHub(formData.githubLink)) {
+      setError("Please enter a valid GitHub profile URL.");
+      return;
+    }
+
     setLoading(true); // Set loading state
     // Simulate form submission logic (e.g., API call)
     setTimeout(() => {
@@ -57,6 +102,9 @@ const StudentForm = () => {
           Student Registration
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Display error message if any */}
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          
           {!showEducation ? (
             <>
               {/* Full Name */}
@@ -182,19 +230,15 @@ const StudentForm = () => {
                 <label className="block font-medium mb-1 text-golden" htmlFor="yearOfCampus">
                   Year of Campus
                 </label>
-                <select
+                <input
+                  type="text"
                   id="yearOfCampus"
                   name="yearOfCampus"
                   value={formData.yearOfCampus}
                   onChange={handleChange}
                   className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
-                >
-                  <option value="">Select Year of Campus</option>
-                  <option value="Freshman">Freshman</option>
-                  <option value="Sophomore">Sophomore</option>
-                  <option value="Junior">Junior</option>
-                  <option value="Senior">Senior</option>
-                </select>
+                  placeholder="Enter your year of campus"
+                />
               </div>
 
               {/* Campus Name */}
@@ -216,7 +260,7 @@ const StudentForm = () => {
               {/* GitHub Link */}
               <div>
                 <label className="block font-medium mb-1 text-golden" htmlFor="githubLink">
-                  GitHub Link (optional)
+                  GitHub Link
                 </label>
                 <input
                   type="url"
@@ -225,14 +269,30 @@ const StudentForm = () => {
                   value={formData.githubLink}
                   onChange={handleChange}
                   className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
-                  placeholder="Enter your GitHub profile URL"
+                  placeholder="Enter your GitHub link"
+                />
+              </div>
+
+              {/* LinkedIn Profile */}
+              <div>
+                <label className="block font-medium mb-1 text-golden" htmlFor="linkedinProfile">
+                  LinkedIn Profile
+                </label>
+                <input
+                  type="url"
+                  id="linkedinProfile"
+                  name="linkedinProfile"
+                  value={formData.linkedinProfile}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
+                  placeholder="Enter your LinkedIn profile URL"
                 />
               </div>
 
               {/* Portfolio Link */}
               <div>
                 <label className="block font-medium mb-1 text-golden" htmlFor="portfolioLink">
-                  Portfolio Link (optional)
+                  Portfolio Link
                 </label>
                 <input
                   type="url"
@@ -241,7 +301,7 @@ const StudentForm = () => {
                   value={formData.portfolioLink}
                   onChange={handleChange}
                   className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
-                  placeholder="Enter your portfolio URL"
+                  placeholder="Enter your portfolio link"
                 />
               </div>
 
@@ -255,7 +315,7 @@ const StudentForm = () => {
                   id="cv"
                   name="cv"
                   onChange={handleFileChange}
-                  className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
+                  className="w-full border border-golden rounded focus:outline-none transition duration-200 ease-in-out"
                 />
               </div>
 
@@ -269,7 +329,7 @@ const StudentForm = () => {
                   id="universityDocument"
                   name="universityDocument"
                   onChange={handleFileChange}
-                  className="w-full p-2 border border-golden rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out"
+                  className="w-full border border-golden rounded focus:outline-none transition duration-200 ease-in-out"
                 />
               </div>
 
@@ -284,10 +344,7 @@ const StudentForm = () => {
                 </button>
                 <button
                   type="submit"
-                  className={`bg-golden text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-200 ease-in-out ${
-                    loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  disabled={loading}
+                  className="text-white bg-golden py-2 px-4 rounded hover:bg-yellow-500 transition duration-200 ease-in-out"
                 >
                   {loading ? <FaSpinner className="animate-spin" /> : "Submit"}
                 </button>
