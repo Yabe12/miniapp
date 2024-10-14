@@ -11,6 +11,9 @@ export default defineConfig({
     },
   },
   build: {
+    rollupOptions: {
+      external: ['react-qr-scanner'],  // Mark react-qr-scanner as external
+    },
     outDir: 'dist',  // Set your custom output directory for the build
   },
 });
